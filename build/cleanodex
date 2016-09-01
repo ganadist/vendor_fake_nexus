@@ -1,0 +1,6 @@
+#!/bin/bash
+# vim: ts=2 sw=2 nocindent expandtab
+rm -rf ${ANDROID_PRODUCT_OUT}/system
+rm -f ${ANDROID_PRODUCT_OUT}/obj/ETC/system_build_prop_intermediates/build.prop
+rm -rf ${ANDROID_PRODUCT_OUT}/root
+

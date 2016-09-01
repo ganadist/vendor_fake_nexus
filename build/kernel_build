@@ -1,0 +1,74 @@
+#!/bin/bash
+# vim: ts=2 sw=2 nocindent expandtab
+
+KERNEL_OUT=${OUT}/obj/KERNEL_OBJ
+
+case "$TARGET_PRODUCT" in
+  "occam" | "mako")
+      KERNEL_SRC=${ANDROID_BUILD_TOP}/kernel/msm/mako
+      KERNEL_PREBUILT_DIR=${ANDROID_BUILD_TOP}/device/lge/mako-kernel/
+      PRODUCT_DEVICE=mako
+      KERNEL_ARCH=arm
+    ;;
+  "hammerhead")
+      KERNEL_SRC=${ANDROID_BUILD_TOP}/kernel/msm/hammerhead
+      KERNEL_PREBUILT_DIR=${ANDROID_BUILD_TOP}/device/lge/hammerhead-kernel/
+      PRODUCT_DEVICE=hammerhead
+      KERNEL_ARCH=arm
+    ;;
+  *)
+    echo "not supported product name:" \"${TARGET_PRODUCT}\"
+    exit 1
+    ;;
+esac
+
+case "$KERNEL_ARCH" in
+  "arm")
+    CROSS_COMPILE="${ANDROID_BUILD_TOP}/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9/bin/arm-linux-androidkernel-"
+    ;;
+  *)
+    echo "not supported arch:" \"${TARGET_PRODUCT}\"
+    exit 1
+    ;;
+esac
+
+
+KERNEL_DEFCONFIG=${PRODUCT_DEVICE}_defconfig
+if [ -n ${USE_CCACHE} ]; then
+  CROSS_COMPILE="${ANDROID_BUILD_TOP}/prebuilts/misc/linux-x86/ccache/ccache $CROSS_COMPILE"
+fi
+
+kernel_make() {
+  make -C ${KERNEL_SRC} O=${KERNEL_OUT} \
+      ARCH=${KERNEL_ARCH} \
+      CROSS_COMPILE="${CROSS_COMPILE}" -j$(getconf _NPROCESSORS_ONLN)  "$@"
+}
+
+kernel_build() {
+  rm -rf ${KERNEL_OUT}
+  mkdir -p ${KERNEL_OUT}
+  mkdir -p ${KERNEL_PREBUILT_DIR}
+  kernel_make mrproper "$@" && \
+      kernel_make ${KERNEL_DEFCONFIG} "$@" && \
+      kernel_make zImage "$@" && \
+      cp -f ${KERNEL_OUT}/arch/arm/boot/zImage ${KERNEL_PREBUILT_DIR}/kernel && \
+      cp -f ${KERNEL_OUT}/arch/arm/boot/zImage ${ANDROID_PRODUCT_OUT}/kernel
+}
+
+case "$@" in
+  'defconfig')
+      kernel_make mrproper && \
+          -p ${KERNEL_OUT}/ && \
+          kernel_make ${KERNEL_DEFCONFIG} && \
+          kernel_make savedefconfig
+    ;;
+  'menuconfig')
+      mkdir -p ${KERNEL_OUT}/ && \
+          kernel_make menuconfig && \
+          kernel_make savedefconfig && \
+          cp -f ${KERNEL_OUT}/defconfig ${KERNEL_SRC}/arch/${KERNEL_ARCH}/configs/${KERNEL_DEFCONFIG}
+    ;;
+  *)
+    kernel_build "$@"
+    ;;
+esac
