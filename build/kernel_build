@@ -58,8 +58,8 @@ kernel_build() {
 
 case "$@" in
   'defconfig')
-      kernel_make mrproper && \
-          -p ${KERNEL_OUT}/ && \
+      mkdir -p ${KERNEL_OUT}/ && \
+          kernel_make mrproper && \
           kernel_make ${KERNEL_DEFCONFIG} && \
           kernel_make savedefconfig
     ;;
