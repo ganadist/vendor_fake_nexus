@@ -5,14 +5,14 @@ KERNEL_OUT=${OUT}/obj/KERNEL_OBJ
 
 case "$TARGET_PRODUCT" in
   "occam" | "mako")
+      PRODUCT_VENDOR=lge
       KERNEL_SRC=${ANDROID_BUILD_TOP}/kernel/msm/mako
-      KERNEL_PREBUILT_DIR=${ANDROID_BUILD_TOP}/device/lge/mako-kernel/
       PRODUCT_DEVICE=mako
       KERNEL_ARCH=arm
     ;;
   "hammerhead")
+      PRODUCT_VENDOR=lge
       KERNEL_SRC=${ANDROID_BUILD_TOP}/kernel/msm/hammerhead
-      KERNEL_PREBUILT_DIR=${ANDROID_BUILD_TOP}/device/lge/hammerhead-kernel/
       PRODUCT_DEVICE=hammerhead
       KERNEL_ARCH=arm
     ;;
@@ -32,6 +32,7 @@ case "$KERNEL_ARCH" in
     ;;
 esac
 
+KERNEL_PREBUILT_DIR=${ANDROID_BUILD_TOP}/device/${PRODUCT_VENDOR}/${PRODUCT_DEVICE}-kernel/
 
 KERNEL_DEFCONFIG=${PRODUCT_DEVICE}_defconfig
 if [ -n ${USE_CCACHE} ]; then
