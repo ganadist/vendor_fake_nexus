@@ -9,12 +9,16 @@ case "$TARGET_PRODUCT" in
       KERNEL_SRC=${ANDROID_BUILD_TOP}/kernel/msm/mako
       PRODUCT_DEVICE=mako
       KERNEL_ARCH=arm
+      MAKE_TARGET=zImage
+      KERNEL_OUT_MAP=zImage:kernel
     ;;
   "hammerhead")
       PRODUCT_VENDOR=lge
       KERNEL_SRC=${ANDROID_BUILD_TOP}/kernel/msm/hammerhead
       PRODUCT_DEVICE=hammerhead
       KERNEL_ARCH=arm
+      MAKE_TARGET=zImage-dtb
+      KERNEL_OUT_MAP=zImage-dtb:zImage-dtb
     ;;
   *)
     echo "not supported product name:" \"${TARGET_PRODUCT}\"
@@ -51,9 +55,10 @@ kernel_build() {
   mkdir -p ${KERNEL_PREBUILT_DIR}
   kernel_make mrproper "$@" && \
       kernel_make ${KERNEL_DEFCONFIG} "$@" && \
-      kernel_make zImage "$@" && \
-      cp -f ${KERNEL_OUT}/arch/arm/boot/zImage ${KERNEL_PREBUILT_DIR}/kernel && \
-      cp -f ${KERNEL_OUT}/arch/arm/boot/zImage ${ANDROID_PRODUCT_OUT}/kernel
+      kernel_make "$MAKE_TARGET" "$@" || exit 1
+  KERNEL_BIN=${KERNEL_OUT}/arch/${KERNEL_ARCH}/boot/${KERNEL_OUT_MAP/:*}
+  cp -f ${KERNEL_BIN} ${KERNEL_PREBUILT_DIR}/${KERNEL_OUT_MAP/*:} &&
+      cp -f ${KERNEL_BIN} ${ANDROID_PRODUCT_OUT}/kernel
 }
 
 case "$@" in
