@@ -1,0 +1,13 @@
+#!/bin/bash
+# vim: ts=2 sw=2 expandtab
+OVERLAY_DIR=$1
+MODEL_NUMBER=$2
+LAYOUT_PACKAGE_DIR=vendor/fake_nexus/apps/FakeNexusLayout
+
+OVERLAY_RESOURCE_DIR=${OVERLAY_DIR}/${LAYOUT_PACKAGE_DIR}/res/
+MODEL_SUBR="s/ _MODEL_NUMBER_/ ${MODEL_NUMBER}/g"
+rm -rf ${OVERLAY_RESOURCE_DIR}/values*
+mkdir -p ${OVERLAY_RESOURCE_DIR}
+
+cp -a ${ANDROID_BUILD_TOP}/${LAYOUT_PACKAGE_DIR}/res/values* ${OVERLAY_RESOURCE_DIR}/
+find ${OVERLAY_RESOURCE_DIR} -name "*.xml" -exec perl -pi -e "$MODEL_SUBR" {} \;

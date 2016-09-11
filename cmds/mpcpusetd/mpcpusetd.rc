@@ -1,0 +1,5 @@
+service mpcpusetd /system/bin/mpcpusetd
+    class main
+    user root
+    group root system
+    writepid /dev/cpuset/foreground/tasks

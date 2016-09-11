@@ -1,0 +1,35 @@
+From 318c6bbd6aa65c7c8e420aa0e513bb3829633636 Mon Sep 17 00:00:00 2001
+From: YOUNG HO CHA <ganadist@gmail.com>
+Date: Wed, 31 Aug 2016 11:15:26 +0900
+Subject: [PATCH 1/2] linker: allow text relocation for system daemons
+
+Signed-off-by: YOUNG HO CHA <ganadist@gmail.com>
+---
+ linker/linker.cpp | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/linker/linker.cpp b/linker/linker.cpp
+index 39aa2ca..cbcf855 100644
+--- a/linker/linker.cpp
++++ b/linker/linker.cpp
+@@ -49,6 +49,7 @@
+ #include "private/KernelArgumentBlock.h"
+ #include "private/ScopedPthreadMutexLocker.h"
+ #include "private/ScopeGuard.h"
++#include "private/android_filesystem_config.h"
+ 
+ #include "linker.h"
+ #include "linker_block_allocator.h"
+@@ -3924,7 +3925,8 @@ bool soinfo::link_image(const soinfo_list_t& global_group, const soinfo_list_t&
+ #if !defined(__LP64__)
+   if (has_text_relocations) {
+     // Fail if app is targeting sdk version > 22
+-    if (get_application_target_sdk_version() > 22) {
++    if (get_application_target_sdk_version() > 22 &&
++		    getuid() >= AID_EVERYBODY) {
+       PRINT("%s: has text relocations", get_realpath());
+       DL_ERR("%s: has text relocations", get_realpath());
+       return false;
+-- 
+2.9.3
+

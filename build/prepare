@@ -9,7 +9,10 @@ TOP=${ANDROID_BUILD_TOP}
 
 case "$TARGET_PRODUCT" in
   "occam")
-    PATCHES_DIRNAME=${TOP}/device/lge/occam/patches
+    DEVICE_PATCHES_DIRNAME=${TOP}/device/lge/occam/patches
+    ;;
+  "hammerhead")
+    DEVICE_PATCHES_DIRNAME=${TOP}/device/lge/hammerhead/patches
     ;;
   *)
     echo "${TARGET_PRODUCT} is not supported by fake_nexus. abort"
@@ -17,7 +20,9 @@ case "$TARGET_PRODUCT" in
     ;;
 esac
 
-for D in ${PATCHES_DIRNAME}/*
+FAKE_NEXUS_PATCHES_DIRNAME=${TOP}/vendor/fake_nexus/patches
+
+for D in ${DEVICE_PATCHES_DIRNAME}/* ${FAKE_NEXUS_PATCHES_DIRNAME}/*
 do
   PD=$(basename $D)
   APPLY_DIR=${PD//_/\/}
