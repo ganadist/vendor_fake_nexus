@@ -10,3 +10,11 @@ prepare() {
   $(gettop)/vendor/fake_nexus/build/prepare "$@"
 }
 
+generate_home_layout() {
+  $(gettop)/vendor/fake_nexus/build/generate_home_layout "$@"
+}
+
+flash() {
+  $(gettop)/vendor/fake_nexus/build/flash "$@"
+}
+
