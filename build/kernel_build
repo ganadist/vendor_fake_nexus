@@ -28,7 +28,7 @@ esac
 
 case "$KERNEL_ARCH" in
   "arm")
-    CROSS_COMPILE="${ANDROID_BUILD_TOP}/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9/bin/arm-linux-androidkernel-"
+    CROSS_COMPILE="${ANDROID_BUILD_TOP}/prebuilts/gcc/linux-x86/arm/arm-eabi-4.8/bin/arm-eabi-"
     ;;
   *)
     echo "not supported arch:" \"${TARGET_PRODUCT}\"
