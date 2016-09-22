@@ -1,15 +1,14 @@
 #/bin/bash
 # vim: ts=2 sw=2 nocindent expandtab
 
-repo forall -c "git reset --hard && git clean -f -d && git am --abort"
-repo abandon fake_nexus 
-repo start fake_nexus --all
-
 TOP=${ANDROID_BUILD_TOP}
 
 case "$TARGET_PRODUCT" in
   "occam")
-    PATCHES_DIRNAME=${TOP}/device/lge/occam/patches
+    DEVICE_PATCHES_DIRNAME=${TOP}/device/lge/occam/patches
+    ;;
+  "hammerhead")
+    DEVICE_PATCHES_DIRNAME=${TOP}/device/lge/hammerhead/patches
     ;;
   *)
     echo "${TARGET_PRODUCT} is not supported by fake_nexus. abort"
@@ -17,7 +16,29 @@ case "$TARGET_PRODUCT" in
     ;;
 esac
 
-for D in ${PATCHES_DIRNAME}/*
+FAKE_NEXUS_PATCHES_DIRNAME=${TOP}/vendor/fake_nexus/patches
+
+if [ '$1' != '-f' ]; then
+  PATCH_BACKUP_DIR=`mktemp -d --suffix .fake_nexus`
+  echo "backup patches to ${PATCH_BACKUP_DIR}"
+
+  TMP_DEVICE_PATCHES=${PATCH_BACKUP_DIR}/device
+  TMP_FAKE_NEXUS_PATCHES=${PATCH_BACKUP_DIR}/fake_nexus
+
+  rm -rf ${PATCH_BACKUP_DIR}
+  mkdir -p ${TMP_DEVICE_PATCHES} ${TMP_FAKE_NEXUS_PATCHES}
+
+  cp -a ${DEVICE_PATCHES_DIRNAME}/* ${TMP_DEVICE_PATCHES}/ || exit 1
+  cp -a ${FAKE_NEXUS_PATCHES_DIRNAME}/* ${TMP_FAKE_NEXUS_PATCHES}/ || exit 1
+  DEVICE_PATCHES_DIRNAME=${TMP_DEVICE_PATCHES}
+  FAKE_NEXUS_PATCHES_DIRNAME=${TMP_FAKE_NEXUS_PATCHES}
+fi
+
+repo forall -c "git reset --hard && git clean -fd && git am --abort"
+repo abandon fake_nexus
+repo start fake_nexus --all
+
+for D in ${DEVICE_PATCHES_DIRNAME}/* ${FAKE_NEXUS_PATCHES_DIRNAME}/*
 do
   PD=$(basename $D)
   APPLY_DIR=${PD//_/\/}
@@ -26,7 +47,7 @@ do
   for PATCH in ${D}/*
   do
     echo "apply" ${PATCH}
-    ( cd ${APPLY_DIR} && git am ${PATCH} )
+    ( cd ${APPLY_DIR} && git am ${PATCH} || exit 1 )
   done
 done
 
