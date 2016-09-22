@@ -10,9 +10,10 @@ PRODUCT_PROPERTY_OVERRIDES += \
 	ro.com.android.dataroaming=false \
 	ro.com.android.mobiledata=false \
 
-
 PRODUCT_PACKAGES := \
 	NexusLauncher \
+	FakeNexusLayout \
+	FakeNexusProvision \
 
 ifeq ($(TARGET_BUILD_VARIANT),user)
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES := \
