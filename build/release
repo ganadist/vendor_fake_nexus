@@ -1,0 +1,23 @@
+#!/bin/bash
+# vim: ts=2 sw=2 expandtab nocindent
+# This script will perform follow things
+# https://source.android.com/devices/tech/ota/sign_builds.html
+
+FAKE_NEXUS_TOOLS_DIR=${ANDROID_BUILD_TOP}/vendor/fake_nexus/build
+RELEASE_TOOLS_DIR=${ANDROID_BUILD_TOP}/build/tools/releasetools
+DATE=`date '+%Y%m%d'`
+DIST_DIR=dist/${DATE}
+TARGET_FILENAME=${TARGET_PRODUCT}-target_files-${DATE}.zip
+UNSIGNED_TARGET_FILES=${DIST_DIR}/${TARGET_FILENAME}
+SIGNED_TARGET_FILES=${DIST_DIR}/signed-${TARGET_FILENAME}
+SIGNED_IMAGE=${DIST_DIR}/signed-${TARGET_PRODUCT}-img-${DATE}.zip
+
+${FAKE_NEXUS_TOOLS_DIR}/cleanodex && \
+  make -j$(getconf _NPROCESSORS_ONLN) target-files-package dist DIST_DIR=${DIST_DIR} && \
+  ${RELEASE_TOOLS_DIR}/sign_target_files_apks \
+      --path=${ANDROID_HOST_OUT} \
+      -d vendor/fake_nexus/build/security \
+      -o ${UNSIGNED_TARGET_FILES} \
+      ${SIGNED_TARGET_FILES} &&
+  ${RELEASE_TOOLS_DIR}/img_from_target_files \
+      ${SIGNED_TARGET_FILES} ${SIGNED_IMAGE}
