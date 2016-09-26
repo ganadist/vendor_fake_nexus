@@ -12,6 +12,14 @@ UNSIGNED_TARGET_FILES=${DIST_DIR}/${TARGET_FILENAME}
 SIGNED_TARGET_FILES=${DIST_DIR}/signed-${TARGET_FILENAME}
 SIGNED_IMAGE=${DIST_DIR}/signed-${TARGET_PRODUCT}-img-${DATE}.zip
 
+cd ${ANDROID_BUILD_TOP}
+
+if [ x"$@" != x"-f" ]; then
+${FAKE_NEXUS_TOOLS_DIR}/cleanodex && \
+  make -j$(getconf _NPROCESSORS_ONLN) target-files-package dist DIST_DIR=${DIST_DIR} || \
+      exit 1
+fi
+
 TMPDIR=`mktemp -d -t fake_nexus.XXXXXXXXXX`
 mkdir -p ${TMPDIR}
 export TMPDIR
@@ -22,17 +30,27 @@ clean_tmp() {
 
 trap clean_tmp EXIT
 
+# FIXME
+# several apps are crashed on non-debuggable build
+# so turn on debuggable flag to workaround
+switch_debuggable() {
+  TARGET_FILES=$1
+  DEFAULT_PROP=BOOT/RAMDISK/default.prop
+  (
+    cd $(dirname ${TARGET_FILES}) && \
+      mkdir -p BOOT/RAMDISK && \
+      unzip -p ${TARGET_FILES} ${DEFAULT_PROP} | sed -e "s/ro.debuggable=0/ro.debuggable=1/g" > ${DEFAULT_PROP} && \
+      zip -u ${TARGET_FILES} ${DEFAULT_PROP} && \
+      rm -rf BOOT || exit 1
+  )
+}
 
-if [ "$@" != "-f" ]; then
-${FAKE_NEXUS_TOOLS_DIR}/cleanodex && \
-  make -j$(getconf _NPROCESSORS_ONLN) target-files-package dist DIST_DIR=${DIST_DIR} || \
-      exit 1
-fi
-
-${RELEASE_TOOLS_DIR}/sign_target_files_apks \
+switch_debuggable ${ANDROID_BUILD_TOP}/${UNSIGNED_TARGET_FILES} && \
+  ${RELEASE_TOOLS_DIR}/sign_target_files_apks \
       --path=${ANDROID_HOST_OUT} \
+      --extra=ro.debuggable=0 \
       -d vendor/fake_nexus/build/security \
       -o ${UNSIGNED_TARGET_FILES} \
-      ${SIGNED_TARGET_FILES} &&
+      ${SIGNED_TARGET_FILES} && \
   ${RELEASE_TOOLS_DIR}/img_from_target_files \
       ${SIGNED_TARGET_FILES} ${SIGNED_IMAGE}
