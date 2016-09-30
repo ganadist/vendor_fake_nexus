@@ -30,9 +30,6 @@ clean_tmp() {
 
 trap clean_tmp EXIT
 
-# FIXME
-# several apps are crashed on non-debuggable build
-# so turn on debuggable flag to workaround
 switch_debuggable() {
   TARGET_FILES=$1
   DEFAULT_PROP=BOOT/RAMDISK/default.prop
@@ -45,8 +42,7 @@ switch_debuggable() {
   )
 }
 
-switch_debuggable ${ANDROID_BUILD_TOP}/${UNSIGNED_TARGET_FILES} && \
-  ${RELEASE_TOOLS_DIR}/sign_target_files_apks \
+${RELEASE_TOOLS_DIR}/sign_target_files_apks \
       --path=${ANDROID_HOST_OUT} \
       --extra=ro.debuggable=0 \
       -d vendor/fake_nexus/build/security \
