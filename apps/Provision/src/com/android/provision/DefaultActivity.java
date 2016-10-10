@@ -18,8 +18,14 @@ package com.android.provision;
 
 import android.app.Activity;
 import android.content.ComponentName;
+import android.content.Intent;
+import android.content.pm.ComponentInfo;
+import android.content.pm.IPackageManager;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.RemoteException;
+import android.os.ServiceManager;
 import android.provider.Settings;
 import android.util.Slog;
 
@@ -31,29 +37,77 @@ public class DefaultActivity extends Activity {
 
     private PackageManager mPm;
 
-    private void enableSetupWizard() {
-        final boolean device_provisioned = Settings.Global.getInt(
+    private void setProvisionState() {
+        Settings.Global.putInt(
                 getContentResolver(),
-                Settings.Global.DEVICE_PROVISIONED, 0) == 1;
-        final boolean user_setup_completed = Settings.Secure.getInt(
+                Settings.Global.DEVICE_PROVISIONED, 0);
+        Settings.Secure.putInt(
                 getContentResolver(),
-                Settings.Secure.USER_SETUP_COMPLETE, 0) == 1;
+                Settings.Secure.USER_SETUP_COMPLETE, 0);
+    }
 
+    private static final ComponentInfo[] EMPTY = {};
+    private void resetComponentsEnableState(ComponentInfo[] components) {
+        if (components == null) {
+            components = EMPTY;
+        }
         ComponentName name;
-        if (!device_provisioned || !user_setup_completed) {
-            Slog.v(TAG, "Device is not provisioned yet. Enable SetupWizard");
-            // enable setup wizard for provisioning
-            final String setupwizard = "com.google.android.setupwizard";
-            final String[] activities = {
-                    "com.google.android.setupwizard.SetupWizardActivity",
-            };
-            for (String activity : activities) {
-                try {
-                    name = new ComponentName(setupwizard, activity);
-                    mPm.setComponentEnabledSetting(name,
-                            PackageManager.COMPONENT_ENABLED_STATE_DEFAULT, 0);
-                } catch (Exception e) { }
+        for (ComponentInfo info : components) {
+            try {
+                name = new ComponentName(info.packageName, info.name);
+                mPm.setComponentEnabledSetting(name,
+                        PackageManager.COMPONENT_ENABLED_STATE_DEFAULT, 0);
+            } catch (Exception e) {
+                Slog.e(TAG, "cannot restore enable state.", e);
             }
+        }
+    }
+
+    private void resetGoogleComponentEnableState() {
+        final String[] packages = {
+                "com.google.android.setupwizard",
+                "com.google.android.gms",
+                "com.google.android.googlequicksearchbox",
+                "com.android.vending",
+                "com.google.android.gm",
+                "com.google.android.gsf",
+                "com.google.android.apps.gcs",
+        };
+
+        Slog.v(TAG, "First boot with Fake Nexus Rom. Enable Google Components");
+
+        // restore enable state as provisioning
+        for (String pkg : packages) {
+            try {
+                PackageInfo info = mPm.getPackageInfo(pkg,
+                    PackageManager.GET_ACTIVITIES |
+                    PackageManager.GET_PROVIDERS |
+                    PackageManager.GET_RECEIVERS |
+                    PackageManager.GET_SERVICES |
+                    PackageManager.MATCH_DISABLED_COMPONENTS );
+
+                resetComponentsEnableState(info.activities);
+                resetComponentsEnableState(info.providers);
+                resetComponentsEnableState(info.receivers);
+                resetComponentsEnableState(info.services);
+            } catch (PackageManager.NameNotFoundException e) {
+                Slog.e(TAG, "cannot find package: ", e);
+            }
+        }
+    }
+
+    private void resetRuntimePermissions() {
+        Slog.v(TAG, "Reset all runtime permissions");
+        IPackageManager pm =
+                IPackageManager.Stub.asInterface(ServiceManager.getService("package"));
+        try {
+            pm.resetRuntimePermissions();
+        } catch (RemoteException e) {
+            Slog.e(TAG, "Remote exception", e);
+        } catch (IllegalArgumentException e) {
+            Slog.e(TAG, "Bad argument", e);
+        } catch (SecurityException e) {
+            Slog.e(TAG, "Operation not allowed: ", e);
         }
     }
 
@@ -70,8 +124,20 @@ public class DefaultActivity extends Activity {
         super.onCreate(icicle);
         mPm = getPackageManager();
 
-        enableSetupWizard();
+        resetRuntimePermissions();
+
+        /* set provision state to initiate setup wizard */
+        setProvisionState();
+
+        /* reset enabled state of Google compoenet packages */
+        resetGoogleComponentEnableState();
+
         disableProvision();
+
+        /* start HOME intent for testing easy */
+        final Intent homeIntent = new Intent(Intent.ACTION_MAIN);
+        homeIntent.addCategory(Intent.CATEGORY_HOME);
+        startActivity(homeIntent);
 
         // terminate the activity.
         finish();
