@@ -16,7 +16,9 @@ cd ${ANDROID_BUILD_TOP}
 
 if [ x"$@" != x"-f" ]; then
 ${FAKE_NEXUS_TOOLS_DIR}/cleanodex && \
-  make -j$(getconf _NPROCESSORS_ONLN) target-files-package dist DIST_DIR=${DIST_DIR} || \
+  make -j$(getconf _NPROCESSORS_ONLN) \
+      TARGET_NO_RECOVERY=true \
+      target-files-package dist DIST_DIR=${DIST_DIR} || \
       exit 1
 fi
 
