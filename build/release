@@ -18,8 +18,10 @@ if [ x"$@" != x"-f" ]; then
 ${FAKE_NEXUS_TOOLS_DIR}/cleanodex && \
   make -j$(getconf _NPROCESSORS_ONLN) \
       TARGET_NO_RECOVERY=true \
-      target-files-package dist DIST_DIR=${DIST_DIR} || \
-      exit 1
+      bsdiff imgdiff dumpkey signapk \
+      target-files-package \
+      dist DIST_DIR=${DIST_DIR} \
+      || exit 1
 fi
 
 TMPDIR=`mktemp -d -t fake_nexus.XXXXXXXXXX`
