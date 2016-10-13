@@ -10,6 +10,9 @@ PRODUCT_PROPERTY_OVERRIDES += \
 	ro.com.android.dataroaming=false \
 	ro.com.android.mobiledata=false \
 
+PRODUCT_PROPERTY_OVERRIDES += \
+	ro.opa.eligible_device=true \
+
 PRODUCT_PACKAGES := \
 	NexusLauncher \
 	FakeNexusLayout \
