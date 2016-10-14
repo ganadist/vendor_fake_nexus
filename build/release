@@ -6,7 +6,7 @@
 FAKE_NEXUS_TOOLS_DIR=${ANDROID_BUILD_TOP}/vendor/fake_nexus/build
 RELEASE_TOOLS_DIR=${ANDROID_BUILD_TOP}/build/tools/releasetools
 DATE=`date '+%Y%m%d'`
-DIST_DIR=dist/${DATE}
+DIST_DIR=${ANDROID_BUILD_TOP}/dist/${DATE}
 TARGET_FILENAME=${TARGET_PRODUCT}-target_files-${DATE}.zip
 UNSIGNED_TARGET_FILES=${DIST_DIR}/${TARGET_FILENAME}
 SIGNED_TARGET_FILES=${DIST_DIR}/signed-${TARGET_FILENAME}
@@ -34,23 +34,26 @@ clean_tmp() {
 
 trap clean_tmp EXIT
 
-switch_debuggable() {
+override_property() {
   TARGET_FILES=$1
-  DEFAULT_PROP=BOOT/RAMDISK/default.prop
+  PROP_FILE=$2
+  PROP_NAME=$3
+  PROP_VALUE=$4
   (
     cd $(dirname ${TARGET_FILES}) && \
-      mkdir -p BOOT/RAMDISK && \
-      unzip -p ${TARGET_FILES} ${DEFAULT_PROP} | sed -e "s/ro.debuggable=0/ro.debuggable=1/g" > ${DEFAULT_PROP} && \
-      zip -u ${TARGET_FILES} ${DEFAULT_PROP} && \
-      rm -rf BOOT || exit 1
+      mkdir -p $(dirname $PROP_FILE) && \
+      unzip -p ${TARGET_FILES} ${PROP_FILE} | sed -e "s/${PROP_NAME}=.*/${PROP_NAME}=${PROP_VALUE}/g" > ${PROP_FILE} && \
+      zip -u ${TARGET_FILES} ${PROP_FILE} && \
+      rm -rf $(dirname $PROP_FILE) || exit 1
   )
 }
 
 ${RELEASE_TOOLS_DIR}/sign_target_files_apks \
       --path=${ANDROID_HOST_OUT} \
-      --extra=ro.debuggable=0 \
       -d vendor/fake_nexus/build/security \
       -o ${UNSIGNED_TARGET_FILES} \
       ${SIGNED_TARGET_FILES} && \
+#  override_property ${SIGNED_TARGET_FILES} BOOT/RAMDISK/default.prop ro.debuggable 1 && \
+#  override_property ${SIGNED_TARGET_FILES} SYSTEM/build.prop ro.product.model "Pixel XL" && \
   ${RELEASE_TOOLS_DIR}/img_from_target_files \
       ${SIGNED_TARGET_FILES} ${SIGNED_IMAGE}
