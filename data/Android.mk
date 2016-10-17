@@ -2,8 +2,8 @@ LOCAL_PATH := $(call my-dir)
 NEXUS_SOUND_RESOURCE_DIR := $(LOCAL_PATH)/sounds-nexus
 PIXEL_SOUND_RESOURCE_DIR := $(LOCAL_PATH)/sounds-pixel
 
-NEXUS_SOUND_RESOURCES := $(patsubst $(NEXUS_SOUND_RESOURCE_DIR)/%,%,$(shell find $(NEXUS_SOUND_RESOURCE_DIR) -type f))
-PIXEL_SOUND_RESOURCES := $(patsubst $(PIXEL_SOUND_RESOURCE_DIR)/%,%,$(shell find $(PIXEL_SOUND_RESOURCE_DIR) -type f))
+NEXUS_SOUND_RESOURCES := $(patsubst $(NEXUS_SOUND_RESOURCE_DIR)/%,%,$(shell find $(NEXUS_SOUND_RESOURCE_DIR) -type f -o -type l))
+PIXEL_SOUND_RESOURCES := $(patsubst $(PIXEL_SOUND_RESOURCE_DIR)/%,%,$(shell find $(PIXEL_SOUND_RESOURCE_DIR) -type f -o -type l))
 
 define install-sound-files
 include $$(CLEAR_VARS)
