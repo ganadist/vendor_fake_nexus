@@ -18,6 +18,8 @@ PRODUCT_PACKAGES := \
 	FakeNexusLayout \
 	FakeNexusProvision \
 
+#	NexusSoundResources \
+
 ifeq ($(TARGET_BUILD_VARIANT),user)
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES := \
 	ro.adb.secure=1 \
@@ -28,6 +30,5 @@ $(call inherit-product, vendor/google/product/gms.mk)
 $(call inherit-product, vendor/google/product/gms-nexus.mk)
 $(call inherit-product, vendor/google/product/mediaeffect.mk)
 $(call inherit-product, vendor/google/product/bootanimation.mk)
-$(call inherit-product, vendor/fake_nexus/data/AudioPackage.mk)
 
 PRODUCT_DEFAULT_DEV_CERTIFICATE := vendor/fake_nexus/build/security/testkey
