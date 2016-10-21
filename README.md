@@ -22,7 +22,7 @@ To initialize for Nexus 4 android source, you must run this command
     $ chmod a+x ~/bin/repo
     $ mkdir -p ~/src/build/android
     $ cd ~/src/build/android
-    $ repo init -u https://android.googlesource.com/platform/manifest -b android-7.0.0_r4 -p linux
+    $ repo init -u https://android.googlesource.com/platform/manifest -b android-7.1.0_r4 -p linux
     
 
 After initialize repositories, add local_manifests with following commands
