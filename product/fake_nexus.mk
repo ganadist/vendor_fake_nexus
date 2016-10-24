@@ -12,6 +12,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
 
 PRODUCT_PROPERTY_OVERRIDES += \
 	ro.opa.eligible_device=true \
+	ro.storage_manager.enabled=true \
 
 PRODUCT_PACKAGES := \
 	NexusLauncher \
