@@ -19,4 +19,14 @@
 
   <!-- Flag indicating whether round icons should be parsed from the application manifest. -->
   <bool name="config_useRoundIcon">true</bool>
+
+  <!-- Wallpaper cropper package. Used as the default cropper if the active launcher doesn't
+       handle wallpaper cropping.
+  -->
+  <string name="config_wallpaperCropperPackage" translatable="false">com.google.android.apps.wallpaper</string>
+
+  <!-- Component name of the default wallpaper. This will be ImageWallpaper if not
+       specified -->
+  <string name="default_wallpaper_component" translatable="false">com.ustwo.lwp/com.ustwo.lwp.wallpapers.timelapse.TimelapseWallpaperService</string>
+
 </resources>
