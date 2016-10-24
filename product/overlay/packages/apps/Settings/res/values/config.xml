@@ -4,6 +4,9 @@
     <string name="config_wallpaper_picker_package" translatable="false">com.google.android.apps.wallpaper</string>
     <string name="config_wallpaper_picker_class" translatable="false">com.google.android.apps.wallpaper.picker.CategoryPickerActivity</string>
 
+    <!-- When true enable color temperature setting. -->
+    <bool name="config_enableColorTemperature">true</bool>
+
     <!-- Backup settings to launch -->
     <string name="config_backup_settings_intent" translatable="false">#Intent;action=com.google.android.gms.backup.ACTION_BACKUP_SETTINGS;component=com.google.android.gms/.backup.component.BackupSettingsActivity;end</string>
 
