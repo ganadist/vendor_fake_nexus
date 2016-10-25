@@ -2,7 +2,7 @@
 <resources>
   <string name="widget_default_package_name" translatable="false">com.google.android.deskclock</string>
   <string name="widget_default_class_name" translatable="false">com.android.alarmclock.DigitalAppWidgetProvider</string>
-  <string name="default_sms_application" translatable="false">com.google.android.talk</string>
+  <string name="default_sms_application" translatable="false">com.google.android.apps.messaging</string>
   <string name="default_browser" translatable="false">com.android.chrome</string>
   <string name="config_dozeComponent" translatable="false">com.android.systemui/com.android.systemui.doze.DozeService</string>
   <string name="config_appsAuthorizedForSharedAccounts" translatable="false">;com.android.vending;com.android.settings;</string>
