@@ -18,6 +18,7 @@ package com.android.provision;
 
 import android.app.Activity;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ComponentInfo;
 import android.content.pm.IPackageManager;
@@ -26,6 +27,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.os.ServiceManager;
+import android.os.UserManager;
 import android.provider.Settings;
 import android.util.Slog;
 
@@ -123,14 +125,17 @@ public class DefaultActivity extends Activity {
     protected void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         mPm = getPackageManager();
+        UserManager um = (UserManager)getSystemService(Context.USER_SERVICE);
 
-        resetRuntimePermissions();
+        if (um.isSystemUser()) {
+            resetRuntimePermissions();
 
-        /* set provision state to initiate setup wizard */
-        setProvisionState();
+            /* set provision state to initiate setup wizard */
+            setProvisionState();
 
-        /* reset enabled state of Google compoenet packages */
-        resetGoogleComponentEnableState();
+            /* reset enabled state of Google compoenet packages */
+            resetGoogleComponentEnableState();
+        }
 
         disableProvision();
 
