@@ -1,1 +1,2 @@
 -keep class * extends android.app.Activity
+-keep class * extends android.content.BroadcastReceiver
