@@ -10,4 +10,5 @@ PRODUCT_PROPERTY_OVERRIDES := \
 	ro.config.notification_sound=Chime.ogg \
 	ro.config.alarm_alert=Flow.ogg \
 
-PRODUCT_COPY_FILES := vendor/fake_nexus/data/media/bootanimation.zip:system/media/bootanimation.zip:fake_nexus
+PRODUCT_COPY_FILES := vendor/fake_nexus/data/media/bootanimation.zip:system/media/bootanimation.zip:fake_nexus \
+	vendor/fake_nexus/data/data-pixel/nexus.xml:system/etc/sysconfig/nexus.xml:fake_nexus \
