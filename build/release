@@ -48,12 +48,12 @@ override_property() {
   )
 }
 
+# override_property ${UNSIGNED_TARGET_FILES} BOOT/RAMDISK/default.prop ro.debuggable 1 && \
+# override_property ${UNSIGNED_TARGET_FILES} SYSTEM/build.prop ro.product.model "Pixel XL" && \
 ${RELEASE_TOOLS_DIR}/sign_target_files_apks \
       --path=${ANDROID_HOST_OUT} \
       -d vendor/fake_nexus/build/security \
       -o ${UNSIGNED_TARGET_FILES} \
       ${SIGNED_TARGET_FILES} && \
-#  override_property ${SIGNED_TARGET_FILES} BOOT/RAMDISK/default.prop ro.debuggable 1 && \
-#  override_property ${SIGNED_TARGET_FILES} SYSTEM/build.prop ro.product.model "Pixel XL" && \
   ${RELEASE_TOOLS_DIR}/img_from_target_files \
       ${SIGNED_TARGET_FILES} ${SIGNED_IMAGE}
